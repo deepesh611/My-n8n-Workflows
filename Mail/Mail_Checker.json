@@ -1,0 +1,165 @@
+{
+  "name": "Mail Checker",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -620,
+        0
+      ],
+      "id": "903429c2-5366-4e0d-9bad-b1e5de5651fd",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5e58c66f-f354-4aae-a070-ab5cc2f4e9bc",
+              "leftValue": "={{ $json.date.toDateTime() }}",
+              "rightValue": "={{ $today }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "afterOrEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -180,
+        0
+      ],
+      "id": "5e10ca5a-ba63-48f4-88d9-d1053a103daf",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 5,
+        "simple": false,
+        "filters": {
+          "readStatus": "unread"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -400,
+        0
+      ],
+      "id": "48327a81-2c5e-4308-96b3-dd3cf0d7ee2e",
+      "name": "Check Mails",
+      "webhookId": "8b3b3d15-515a-4bb7-bb41-841504edffef",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nkvQ93lyFbWEFUr4",
+          "name": "College ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "deepeshvcd6273@gmail.com",
+        "subject": "Looks like you've got some mails!",
+        "message": "=You have received some emails on your college ID. Have a look. \n\nDate & Time :  {{ $json.date }}",
+        "options": {
+          "appendAttribution": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        20,
+        -160
+      ],
+      "id": "6deea099-ab70-4c67-8000-2e65ffe5cbdc",
+      "name": "Send Notification",
+      "webhookId": "65920d39-2afd-4214-bfd6-3114adffbd36",
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nkvQ93lyFbWEFUr4",
+          "name": "College ID"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Mails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Mails": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "34ae40da-e484-481a-ba56-068219bb1798",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "WOEz1GFlZhAXpUVt",
+  "tags": [
+    {
+      "createdAt": "2025-06-06T14:23:26.042Z",
+      "updatedAt": "2025-06-06T14:23:26.042Z",
+      "id": "U86RCnGKv3jdCyX8",
+      "name": "Tests"
+    }
+  ]
+}

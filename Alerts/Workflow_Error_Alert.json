@@ -1,0 +1,67 @@
+{
+  "name": "Workflow Error Alert",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        20
+      ],
+      "id": "1fc0a068-fe17-49d0-85f7-7dcf0010625a",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "sendTo": "deepeshvcd6273@gmail.com",
+        "subject": "Workflow’s throwing a fit — got an error.",
+        "message": "=<b>Workflow :</b> {{ $json.workflow.name }}\n<br><br><b>Last Executed :</b> {{ $now.toLocaleString() }}\n<br><br><b>Error :</b> {{ $json.execution.error.message }}\n<br><br><b>Link :</b> {{ $json.execution.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        20
+      ],
+      "id": "5fde5a0e-0254-4910-91ad-3b668defc04c",
+      "name": "Gmail",
+      "webhookId": "56293b1a-101b-4406-a767-f6251ba38ea2",
+      "retryOnFail": true,
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nkvQ93lyFbWEFUr4",
+          "name": "College ID"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8cc49c0b-c6a5-47ba-81be-44a56e55af8c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "b87dvc2ESCysrLgy",
+  "tags": []
+}
