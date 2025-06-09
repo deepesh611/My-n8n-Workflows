@@ -1,0 +1,157 @@
+{
+  "name": "Series Update",
+  "nodes": [
+    {
+      "parameters": {
+        "sendTo": "deepeshvcd6273@gmail.com",
+        "subject": "🧐🍿 Something moved in your Jellyfin",
+        "message": "=Hey there,\n<br>\n<br>Your <b>Jellyfin</b> library just changed — something was added... or maybe deleted.<br>\n<br>👀  Here’s what we spotted:\n<br>\n<br>🆕 Added:\n<br>{{ $json.path.split(\"/\").last() }}\n\n<br>\n<br>Your media has a life of its own.\n<br>Check it out before it changes again. 🌀\n<br>\n<br>– Your Watchdog Bot 🐾\n<br>\n<br><b>Time :</b> {{ $now }}",
+        "options": {
+          "appendAttribution": true,
+          "ccList": "vikas@satallc.co.om"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8618b099-b558-4d96-80c7-198ce1b769d3",
+      "name": "Add Alert",
+      "webhookId": "80d7d27e-8aed-4ce9-9e6d-34d50da117d8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "k6ZkLlCsFyaiF0It",
+          "name": "Home Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "=deepeshvcd6273@gmail.com",
+        "subject": "🧐🍿 Something moved in your Jellyfin",
+        "message": "=Hey there,\n<br>\n<br>Your <b>Jellyfin</b> library just changed — something was added... or maybe deleted.<br>\n<br>👀  Here’s what we spotted:\n<br>\n<br>🗑️ Removed:\n<br>{{ $json.path.split(\"/\").last() }}\n\n<br>\n<br>Your media has a life of its own.\n<br>Check it out before it changes again. 🌀\n<br>\n<br>– Your Watchdog Bot 🐾\n<br>\n<br><b>Time :</b> {{ $now }}",
+        "options": {
+          "appendAttribution": true,
+          "ccList": "vikas@satallc.co.om"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        200
+      ],
+      "id": "9d3a57da-04a6-4a2a-b17c-ffba03f3178a",
+      "name": "Delete Alert",
+      "webhookId": "80d7d27e-8aed-4ce9-9e6d-34d50da117d8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "k6ZkLlCsFyaiF0It",
+          "name": "Home Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "triggerOn": "folder",
+        "path": "/media/jellyfin/TV Shows",
+        "events": [
+          "addDir",
+          "unlinkDir"
+        ],
+        "options": {
+          "awaitWriteFinish": true,
+          "ignored": "=*.trickplay\n*.jpg\n*.nfo\n*.png\n*.txt",
+          "depth": 1
+        }
+      },
+      "type": "n8n-nodes-base.localFileTrigger",
+      "typeVersion": 1,
+      "position": [
+        -460,
+        100
+      ],
+      "id": "bed8fb7e-bde5-4711-a574-9172077f690b",
+      "name": "Series"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fd241b28-3b44-43f6-a216-664f59534c4e",
+              "leftValue": "={{ $json.event }}",
+              "rightValue": "addDir",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -260,
+        100
+      ],
+      "id": "130117b7-8256-4872-849d-5be6b5028eb7",
+      "name": "Series Added or Deleted",
+      "retryOnFail": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Series": {
+      "main": [
+        [
+          {
+            "node": "Series Added or Deleted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Series Added or Deleted": {
+      "main": [
+        [
+          {
+            "node": "Add Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c4a422b6-e5c2-4c4a-a342-a5c97c5ecae3",
+  "meta": {
+    "instanceId": "532c6f55d902ef7579b5ae923e397a93c81d17ca76a17565f61155f8938fa5d8"
+  },
+  "id": "F3FD4Lc6GdLXESSb",
+  "tags": []
+}

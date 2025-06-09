@@ -1,0 +1,303 @@
+{
+  "name": "Movies Update",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerOn": "folder",
+        "path": "/media/jellyfin/Movies",
+        "events": [
+          "add",
+          "unlink"
+        ],
+        "options": {
+          "awaitWriteFinish": true,
+          "followSymlinks": false,
+          "ignored": "*.trickplay|*.jpg|*.nfo|*.png",
+          "depth": 0
+        }
+      },
+      "type": "n8n-nodes-base.localFileTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -40
+      ],
+      "id": "c4d4a469-5833-4bd2-a77e-ade4dc52772c",
+      "name": "Movies"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e00ea4ce-ba0d-4511-a679-83e8c9233416",
+              "leftValue": "={{ $json.event }}",
+              "rightValue": "add",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        220,
+        -40
+      ],
+      "id": "97abdc98-62f2-4b08-86ad-6dd94ee93605",
+      "name": "Movie Added or Deleted",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "sendTo": "=deepeshvcd6273@gmail.com",
+        "subject": "🧐🍿 Something moved in your Jellyfin",
+        "message": "=Hey there,\n<br>\n<br>Your <b>Jellyfin</b> library just changed — something was added... or maybe deleted.<br>\n<br>👀  Here’s what we spotted:\n<br>\n<br>🆕 Added:\n<br>{{ $json.path.split(\"/\").last() }}\n\n<br>\n<br>Your media has a life of its own.\n<br>Check it out before it changes again. 🌀\n<br>\n<br>– Your Watchdog Bot 🐾\n<br>\n<br><b>Time :</b> {{ $now }}",
+        "options": {
+          "appendAttribution": true,
+          "ccList": ""
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        700,
+        -240
+      ],
+      "id": "7b3c2938-8840-4bac-b313-32529a93926e",
+      "name": "Add Alert",
+      "webhookId": "80d7d27e-8aed-4ce9-9e6d-34d50da117d8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "k6ZkLlCsFyaiF0It",
+          "name": "Home Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "deepeshvcd6273@gmail.com",
+        "subject": "🧐🍿 Something moved in your Jellyfin",
+        "message": "=Hey there,\n<br>\n<br>Your <b>Jellyfin</b> library just changed — something was added... or maybe deleted.<br>\n<br>👀  Here’s what we spotted:\n<br>\n<br>🗑️ Removed:\n<br>{{ $json.path.split(\"/\").last() }}\n\n<br>\n<br>Your media has a life of its own.\n<br>Check it out before it changes again. 🌀\n<br>\n<br>– Your Watchdog Bot 🐾\n<br>\n<br><b>Time :</b> {{ $now }}",
+        "options": {
+          "appendAttribution": true,
+          "ccList": "vikas@satallc.co.om"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        700,
+        160
+      ],
+      "id": "9f3badb3-6368-4177-9d6d-38bc4f68ca40",
+      "name": "Delete Alert",
+      "webhookId": "80d7d27e-8aed-4ce9-9e6d-34d50da117d8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "k6ZkLlCsFyaiF0It",
+          "name": "Home Server"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c9c93a45-acdf-4860-a507-1d1f8b5e50e6",
+              "leftValue": "={{ $json.path }}",
+              "rightValue": ".jpg",
+              "operator": {
+                "type": "string",
+                "operation": "notEndsWith"
+              }
+            },
+            {
+              "id": "73326eb5-629e-4fb9-b83b-c1d6dbdefad9",
+              "leftValue": "={{ $json.path }}",
+              "rightValue": ".nfo",
+              "operator": {
+                "type": "string",
+                "operation": "notEndsWith"
+              }
+            },
+            {
+              "id": "badbbce4-d675-474a-ac6b-9292626d1e54",
+              "leftValue": "={{ $json.path }}",
+              "rightValue": ".png",
+              "operator": {
+                "type": "string",
+                "operation": "notEndsWith"
+              }
+            },
+            {
+              "id": "e2b7b4bc-7248-4417-91ce-d65aa517c18f",
+              "leftValue": "={{ $json.path }}",
+              "rightValue": ".txt",
+              "operator": {
+                "type": "string",
+                "operation": "notEndsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        -140
+      ],
+      "id": "797a79d1-0bdd-4076-a914-2eccb71d1080",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "efb79417-1f88-4def-83c0-10b07e207a46",
+              "leftValue": "={{ $json.path }}",
+              "rightValue": ".txt",
+              "operator": {
+                "type": "string",
+                "operation": "notEndsWith"
+              }
+            },
+            {
+              "id": "1513ff95-74fc-437a-b0be-52f3264b8c60",
+              "leftValue": "={{ $json.path }}",
+              "rightValue": ".jpg",
+              "operator": {
+                "type": "string",
+                "operation": "notEndsWith"
+              }
+            },
+            {
+              "id": "1b7c515b-e4b5-484c-b589-9b51b9ee1070",
+              "leftValue": "={{ $json.path }}",
+              "rightValue": ".png",
+              "operator": {
+                "type": "string",
+                "operation": "notEndsWith"
+              }
+            },
+            {
+              "id": "9050f7f1-9852-4af3-a779-2156a04cf742",
+              "leftValue": "={{ $json.path }}",
+              "rightValue": ".nfo",
+              "operator": {
+                "type": "string",
+                "operation": "notEndsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        60
+      ],
+      "id": "948003bd-3754-49e5-bed2-a8cb98f8d3cb",
+      "name": "If1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Movies": {
+      "main": [
+        [
+          {
+            "node": "Movie Added or Deleted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Movie Added or Deleted": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Add Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Delete Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "21ab83e0-a469-400c-9f65-2e28136d4ec0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "532c6f55d902ef7579b5ae923e397a93c81d17ca76a17565f61155f8938fa5d8"
+  },
+  "id": "TqLXZwlTcarzSZ6u",
+  "tags": []
+}
