@@ -1,0 +1,1500 @@
+{
+  "name": "Grossary List",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "task/add-grocery",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": false
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        440
+      ],
+      "id": "7b49f9fb-5a45-4124-92c9-12b354502364",
+      "name": "Webhook",
+      "webhookId": "c69fd001-cf4d-49e9-8d65-3a4116497f70"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a helpful assistant. Extract intent and structure it in JSON format.\n\nUser said: \"{{ $json.body.text }}\"\n\nRespond with:\n{\n  \"action\": \"add/remove/clear/show\",\n  \"list\": \"grocery/reminder\",\n  \"items\": [\"item1\",\"item2\",...]\n}\n\nif there is no such clear instruction, you can set any/all those fields as empty",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        220,
+        440
+      ],
+      "id": "4a8b68e8-e21c-47e2-b3c5-95692c51cea1",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "mistral:instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        308,
+        660
+      ],
+      "id": "ec1f291d-0bb6-44e6-886d-577eadd0d582",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ol0kQTVKiUU3H760",
+          "name": "OpenUI-Ollama"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9aea3176-2771-495b-bc7c-9ce78b4f019e",
+              "name": "action",
+              "value": "={{ $json.text.parseJson().action }}",
+              "type": "string"
+            },
+            {
+              "id": "a4555a5e-12f8-46f1-8f74-c51c63c4ca70",
+              "name": "list",
+              "value": "={{ $json.text.parseJson().list }}",
+              "type": "string"
+            },
+            {
+              "id": "ec6bdb5f-ef96-4fd5-b3b0-e33a36cdc4b3",
+              "name": "item",
+              "value": "={{ $json.text.parseJson().items }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        596,
+        440
+      ],
+      "id": "332abd8e-e677-467f-bcf3-304a5146ed86",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Edit Fields').item.json.list }}",
+                    "rightValue": "grocery",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "742b606a-5d15-4294-a630-86054eb8362e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "grocery"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6bef273b-cce3-4dcd-a28a-b6a6f727def2",
+                    "leftValue": "={{ $('Edit Fields').item.json.list }}",
+                    "rightValue": "todo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "todo"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6f5bed9a-2b44-4014-9559-2ff82375bd97",
+                    "leftValue": "={{ $('Edit Fields').item.json.list }}",
+                    "rightValue": "reminder",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "reminder"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1036,
+        340
+      ],
+      "id": "97021cbe-621d-4e19-9f42-4721c002a661",
+      "name": "which list ?"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Edit Fields').item.json.action }}",
+                    "rightValue": "add",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6763976c-98b5-4685-8e4b-1e4dcee92d08"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "add"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "492c69b2-5d62-4204-b401-425e63962758",
+                    "leftValue": "={{ $('Edit Fields').item.json.action }}",
+                    "rightValue": "clear",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "clear"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9563c89d-9a15-401d-9843-06349be0adcd",
+                    "leftValue": "={{ $('Edit Fields').item.json.action }}",
+                    "rightValue": "show",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "show"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1256,
+        -35
+      ],
+      "id": "dffa6b9a-d027-4357-81c5-bd8e42460b25",
+      "name": "grocery list action ?"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "21270393-eea4-801a-8a2d-ded1b772c45f",
+          "mode": "list",
+          "cachedResultName": "grocery",
+          "cachedResultUrl": "https://www.notion.so/21270393eea4801a8a2dded1b772c45f"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1476,
+        -135
+      ],
+      "id": "c4ce0d18-2323-4fc6-8432-5ed39bfcd561",
+      "name": "Archive Page",
+      "credentials": {
+        "notionApi": {
+          "id": "D4v95UJfharrKG40",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "21270393-eea4-801a-8a2d-ded1b772c45f",
+          "mode": "list",
+          "cachedResultName": "grocery_list",
+          "cachedResultUrl": "https://www.notion.so/21270393eea4801a8a2dded1b772c45f"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1476,
+        190
+      ],
+      "id": "867c8e6c-6f36-4885-8b92-8e8884615de6",
+      "name": "Show List",
+      "credentials": {
+        "notionApi": {
+          "id": "D4v95UJfharrKG40",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items;\nconst names = input.map(item => item.json.name);\nreturn [\n  {\n    json: {\n      list: names.join('\\n')\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        190
+      ],
+      "id": "64b8d9a0-182c-4319-a9e7-133ebd466967",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=Here's your grocery list:\n<br><br>\n{{ $json.list }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1916,
+        190
+      ],
+      "id": "bed85dcf-7670-4686-8487-ba6d4e0a20c8",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "21270393-eea4-801a-8a2d-ded1b772c45f",
+          "mode": "list",
+          "cachedResultName": "grocery_list",
+          "cachedResultUrl": "https://www.notion.so/21270393eea4801a8a2dded1b772c45f"
+        },
+        "title": "={{ $json.item }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2136,
+        -310
+      ],
+      "id": "d35a5e5d-3d65-4ce5-ba74-473c6eda308b",
+      "name": "Add to List",
+      "credentials": {
+        "notionApi": {
+          "id": "D4v95UJfharrKG40",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ba2da40-4410-4c66-8084-45d2607e3c98",
+              "name": "item",
+              "value": "={{ $json.item }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1476,
+        -460
+      ],
+      "id": "21f441f7-be56-421d-8ed3-d98ae027f9e2",
+      "name": "Separate items"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ $('Separate items').item.json.item.length }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1916,
+        -460
+      ],
+      "id": "124640de-fb83-4dbd-97ed-919881d9bdb7",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=Youur grocery list has been updated.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2356,
+        -460
+      ],
+      "id": "27fef68f-4026-43f7-b434-9c2ae62325a0",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "I am sorry. I did not understand your intention. \nLet me know what do you want me to do, and for which list.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1040,
+        600
+      ],
+      "id": "97048fca-9028-420e-bae4-562f0a692a58",
+      "name": "Respond to Webhook3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "385c3fb1-eef4-4f02-8e45-1f800edc5cd6",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "9ef6dae6-e606-4150-9ee1-54b8272676f6",
+              "leftValue": "={{ $json.list }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        440
+      ],
+      "id": "022f0452-90f9-42a7-80b8-dc8ce3c91011",
+      "name": "correct input ?"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ $('count ids').item.json.ids.length }}",
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2356,
+        -10
+      ],
+      "id": "b724aade-a90d-469b-abac-7153388bb679",
+      "name": "Loop Over Items1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $json.item;\nreturn items.map(i => ({ json: { item: i, list: $json.list } }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        -460
+      ],
+      "id": "6d76fdc5-a873-493a-97e0-e49289d69e35",
+      "name": "multiple items",
+      "notesInFlow": true,
+      "notes": "Create multiple single items from a list"
+    },
+    {
+      "parameters": {
+        "operation": "archive",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2600,
+        100
+      ],
+      "id": "3b42ec4d-b535-4823-af69-ad1df55231aa",
+      "name": "Notion1",
+      "credentials": {
+        "notionApi": {
+          "id": "D4v95UJfharrKG40",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ids = items.map(item => item.json.id);\nreturn [\n  {\n    json: {\n      ids: ids\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1916,
+        -10
+      ],
+      "id": "f75fd151-03fc-47e1-8661-ac5130dca374",
+      "name": "count ids"
+    },
+    {
+      "parameters": {
+        "jsCode": "const idArray = items[0].json.ids;\n\nreturn idArray.map(id => ({\n  json: { id }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2136,
+        -10
+      ],
+      "id": "6de4ff3b-f66b-4e2f-9e36-f7758d5bded8",
+      "name": "get multiple items",
+      "notesInFlow": true,
+      "notes": "Create multiple single items from a list"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "The grocery list is ready to be re-used.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2820,
+        -120
+      ],
+      "id": "30e5d9d8-2cac-4c4e-88ff-92e925cf2652",
+      "name": "Respond to Webhook4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0a60b0fd-fcb0-41a3-bb0c-4f4751b1009e",
+              "leftValue": "={{ $json.name}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1696,
+        -135
+      ],
+      "id": "7e394089-3ace-42b4-8f8a-5396e71509f4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Edit Fields').item.json.action }}",
+                    "rightValue": "add",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6763976c-98b5-4685-8e4b-1e4dcee92d08"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "add"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "492c69b2-5d62-4204-b401-425e63962758",
+                    "leftValue": "={{ $('Edit Fields').item.json.action }}",
+                    "rightValue": "clear",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "clear"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9563c89d-9a15-401d-9843-06349be0adcd",
+                    "leftValue": "={{ $('Edit Fields').item.json.action }}",
+                    "rightValue": "show",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "show"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1500,
+        800
+      ],
+      "id": "edcf866a-882b-4e54-b8c5-e2f80457b95b",
+      "name": "grocery list action ?1"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "21270393-eea4-801a-8a2d-ded1b772c45f",
+          "mode": "list",
+          "cachedResultName": "grocery",
+          "cachedResultUrl": "https://www.notion.so/21270393eea4801a8a2dded1b772c45f"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1720,
+        740
+      ],
+      "id": "035ef67e-6f3f-42f1-8d1b-ed6bf9da5758",
+      "name": "Archive Page1",
+      "credentials": {
+        "notionApi": {
+          "id": "D4v95UJfharrKG40",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "21270393-eea4-801a-8a2d-ded1b772c45f",
+          "mode": "list",
+          "cachedResultName": "grocery_list",
+          "cachedResultUrl": "https://www.notion.so/21270393eea4801a8a2dded1b772c45f"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1720,
+        1100
+      ],
+      "id": "f4745b9c-e54e-4539-9179-3f1932df47f2",
+      "name": "Show List1",
+      "credentials": {
+        "notionApi": {
+          "id": "D4v95UJfharrKG40",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items;\nconst names = input.map(item => item.json.name);\nreturn [\n  {\n    json: {\n      list: names.join('\\n')\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1940,
+        1100
+      ],
+      "id": "7cc24781-3a39-4e13-b88f-197ac7b7db03",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=Here's your grocery list:\n<br><br>\n{{ $json.list }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2160,
+        1100
+      ],
+      "id": "b912dc5a-98ee-4b26-a063-58fb9408151b",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "21270393-eea4-801a-8a2d-ded1b772c45f",
+          "mode": "list",
+          "cachedResultName": "grocery_list",
+          "cachedResultUrl": "https://www.notion.so/21270393eea4801a8a2dded1b772c45f"
+        },
+        "title": "={{ $json.item }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2380,
+        520
+      ],
+      "id": "980253d0-8e2d-4a91-b905-4b1e5aeccc14",
+      "name": "Add to List1",
+      "credentials": {
+        "notionApi": {
+          "id": "D4v95UJfharrKG40",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ba2da40-4410-4c66-8084-45d2607e3c98",
+              "name": "item",
+              "value": "={{ $json.item }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1720,
+        400
+      ],
+      "id": "eb7ce067-aa1f-447d-930e-8026ce9acbf0",
+      "name": "Separate items1"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ $('Separate items1').item.json.item.length }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2160,
+        400
+      ],
+      "id": "48d57ccc-0633-4058-af02-f3248c26b4e7",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=Youur grocery list has been updated.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2600,
+        400
+      ],
+      "id": "354e5aa2-8de1-4cf2-b364-2ff4610f2a47",
+      "name": "Respond to Webhook5"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ $('count ids1').item.json.ids.length }}",
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2560,
+        820
+      ],
+      "id": "d8c8bc26-8622-48f0-978d-59765ff0e15a",
+      "name": "Loop Over Items3",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $json.item;\nreturn items.map(i => ({ json: { item: i, list: $json.list } }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1940,
+        400
+      ],
+      "id": "6c30046c-cc11-4c2e-8f4f-f32bf8dd0290",
+      "name": "multiple items1",
+      "notesInFlow": true,
+      "notes": "Create multiple single items from a list"
+    },
+    {
+      "parameters": {
+        "operation": "archive",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2760,
+        860
+      ],
+      "id": "c49976e7-baa3-4a0c-81ef-1340e07fc97d",
+      "name": "Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "D4v95UJfharrKG40",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ids = items.map(item => item.json.id);\nreturn [\n  {\n    json: {\n      ids: ids\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        820
+      ],
+      "id": "347b5706-3c80-4439-83a2-d24272d51844",
+      "name": "count ids1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const idArray = items[0].json.ids;\n\nreturn idArray.map(id => ({\n  json: { id }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2360,
+        820
+      ],
+      "id": "96fce4ae-e080-4d78-86fb-a5a4971a52cd",
+      "name": "get multiple items1",
+      "notesInFlow": true,
+      "notes": "Create multiple single items from a list"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "The grocery list is ready to be re-used.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2960,
+        660
+      ],
+      "id": "26a19ad7-610f-4cf0-b8a6-1069626a4ea9",
+      "name": "Respond to Webhook6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0a60b0fd-fcb0-41a3-bb0c-4f4751b1009e",
+              "leftValue": "={{ $json.name}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1940,
+        740
+      ],
+      "id": "ee4fea33-fd3b-4743-ad94-c961b3bad0f1",
+      "name": "If1"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "imalegend611.duckdns.org:5678",
+            "user-agent": "curl/8.13.0",
+            "accept": "*/*",
+            "content-type": "application/json",
+            "content-length": "29"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "text": "clean up my grocery list"
+          },
+          "webhookUrl": "http://imalegend611.duckdns.org/webhook-test/task/add-grocery",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "correct input ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "which list ?": {
+      "main": [
+        [
+          {
+            "node": "grocery list action ?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "grocery list action ?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "grocery list action ?": {
+      "main": [
+        [
+          {
+            "node": "Separate items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Archive Page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Show List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archive Page": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Show List": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to List": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separate items": {
+      "main": [
+        [
+          {
+            "node": "multiple items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add to List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "correct input ?": {
+      "main": [
+        [
+          {
+            "node": "which list ?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notion1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "multiple items": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "count ids": {
+      "main": [
+        [
+          {
+            "node": "get multiple items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get multiple items": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "count ids",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "grocery list action ?1": {
+      "main": [
+        [
+          {
+            "node": "Separate items1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Archive Page1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Show List1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archive Page1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Show List1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to List1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separate items1": {
+      "main": [
+        [
+          {
+            "node": "multiple items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add to List1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "multiple items1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "count ids1": {
+      "main": [
+        [
+          {
+            "node": "get multiple items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get multiple items1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "count ids1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8a917f7e-3daf-4f4a-8e74-c7b39e61c4e1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "83klABDb2Ldt5SUJ",
+  "tags": []
+}
