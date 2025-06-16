@@ -1,0 +1,571 @@
+{
+  "name": "Label my mails",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "be1ea8dc-0c96-47f5-a90e-165747c96d66",
+                    "leftValue": "={{ $json.From }}",
+                    "rightValue": "rpihomeserver1@gmail.com",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "server"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "27cc49e2-17db-41b9-ba20-7c8eea53bf30",
+                    "leftValue": "={{ $json.Subject }}",
+                    "rightValue": "SPDC",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "SPDC"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cc47c2b9-d753-4dbc-b166-7ce0492f51f0",
+                    "leftValue": "={{ $json.From }}",
+                    "rightValue": "112215055",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "College"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7861bf93-60e1-4ac7-8dba-8ea1d0f55006",
+                    "leftValue": "={{ $json.From }}",
+                    "rightValue": "twingate",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "server"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e92424cd-3752-433b-a890-dd773e37eac5",
+                    "leftValue": "={{ $json.From }}",
+                    "rightValue": "=jobs",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Jobs"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "562e38e4-1501-4186-9500-68d3234c60c3",
+                    "leftValue": "={{ $json.From }}",
+                    "rightValue": "career",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "careers"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        40,
+        237
+      ],
+      "id": "c532e7ba-e55b-49d9-a26d-189b60433687",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail').item.json.id }}",
+        "labelIds": [
+          "Label_7008074725998237316"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        40,
+        37
+      ],
+      "id": "6908dff0-c1fb-42d2-a209-dfca29c05263",
+      "name": "Personal Mails",
+      "webhookId": "a2bd0752-4770-4ea3-be39-b82c8537e5d9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6FJqzgmXo3dNch4N",
+          "name": "Personal Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -620,
+        168.5
+      ],
+      "id": "d8914744-fc36-4459-b947-a3a3254f1dfe",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "filters": {
+          "readStatus": "unread"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -400,
+        168.5
+      ],
+      "id": "f7c280ab-361c-40ba-8998-b36213aa8684",
+      "name": "Gmail",
+      "webhookId": "29ddc950-0ff7-450c-84de-af3932d856ce",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6FJqzgmXo3dNch4N",
+          "name": "Personal Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "018a67f1-edca-47f6-9ad4-f7b0a6112ada",
+              "leftValue": "={{ $json.From }}",
+              "rightValue": "deepeshvcd6273@gmail.com",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "ced84327-c05a-46cd-9b4a-fd15f791c81d",
+              "leftValue": "={{ $json.From }}",
+              "rightValue": "vikasp41@gmail.com",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "40dc1443-01fb-40e4-b7a8-45d79d0dad22",
+              "leftValue": "={{ $json.From }}",
+              "rightValue": "vikas@satallc.co.om",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -180,
+        168.5
+      ],
+      "id": "a6342aa4-ef3b-4055-a5ae-8b4383cfd5ee",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_3153625656525779458"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        -100
+      ],
+      "id": "12ba8293-126a-496c-aa5f-d8f5e2064d84",
+      "name": "media",
+      "webhookId": "5fe8f0d7-a386-4ce7-92fe-cc1caf361b01",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6FJqzgmXo3dNch4N",
+          "name": "Personal Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_3153625656525779458"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        500
+      ],
+      "id": "beabe928-7382-4c72-96d8-32a791a2a3f3",
+      "name": "twingate",
+      "webhookId": "5fe8f0d7-a386-4ce7-92fe-cc1caf361b01",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6FJqzgmXo3dNch4N",
+          "name": "Personal Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_14385429210486809"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        100
+      ],
+      "id": "8217bc8f-644c-472a-939f-8f42347738f2",
+      "name": "SPDC",
+      "webhookId": "80cc7461-dce8-41f2-8579-fb07d496ca9a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6FJqzgmXo3dNch4N",
+          "name": "Personal Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_1064551487456864753"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        700
+      ],
+      "id": "e0b6d26b-4547-4d5a-a0ad-d8809fd46bf8",
+      "name": "Jobs",
+      "webhookId": "27b23dc3-6555-493f-9d2c-4c13219a83b4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6FJqzgmXo3dNch4N",
+          "name": "Personal Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $('Switch').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        500
+      ],
+      "id": "326fecc8-f3f4-4d88-93d2-cfbe937bf69e",
+      "name": "Read em",
+      "webhookId": "8f73006d-b762-465d-882e-8109cf92e689",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6FJqzgmXo3dNch4N",
+          "name": "Personal Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_7084665955984872954"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        300
+      ],
+      "id": "e7d0130d-e5eb-4a8a-85ac-45e043f25bfe",
+      "name": "College",
+      "webhookId": "990f073f-d58f-4673-be24-8c28c2ef6e44",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6FJqzgmXo3dNch4N",
+          "name": "Personal Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail').item.json.id }}",
+        "labelIds": [
+          "Label_7008074725998237316"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        300
+      ],
+      "id": "b88c2a1b-4942-4014-9e43-ce4b580589ed",
+      "name": "Personal Mails1",
+      "webhookId": "a2bd0752-4770-4ea3-be39-b82c8537e5d9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6FJqzgmXo3dNch4N",
+          "name": "Personal Account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "media",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SPDC",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "College",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "twingate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Personal Mails",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "twingate": {
+      "main": [
+        [
+          {
+            "node": "Read em",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "College": {
+      "main": [
+        [
+          {
+            "node": "Personal Mails1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "00f3a1d5-0f81-45c5-8bab-18145f1dd047",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "ZOi3Ji8yxgXi5U8m",
+  "tags": []
+}
